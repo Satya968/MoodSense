@@ -12,6 +12,6 @@
 | 8 | JW-MF-FF-40 | Jumper Wires | Male to Female and Female to Female, 40pcs, 20cm | 2 | 45.00 | 90.00 |
 | 9 | CABLE-USB-MC-1M | USB Cable | Micro USB to USB-A, 1m Length | 1 | 50.00 | 50.00 |
 | 10 | TP4056-TC | Battery Charging Module | Li-ion Charger, USB Type-C, 1A Current | 1 | 30.00 | 30.00 |
-| 11 | TEMP-GUN-IR | Temp Gun | -50°C to +550°C, ±1.5°C Accuracy | 1 | 700.00 | 700.00 |
+| 11 | TEMP-GUN-IR | Temp Gun | -50°C to +550°C, ±1.5°C Accuracy | 1 | 753.00 | 753.00 |
 
-**Total Project Cost: ₹2,525.00**
+**Total Project Cost: ₹2,578.00**
