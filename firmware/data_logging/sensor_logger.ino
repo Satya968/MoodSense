@@ -19,7 +19,7 @@
   -REQUIRED: 4.7kΩ pull-up resistor between data and 3.3V
   
   GSR Sensor:
-  -Signal = GPIO 36 (A0 equivalent)
+  -Signal = GPIO 36
   -VCC = 3.3V
   -GND = GND
 */
@@ -79,9 +79,9 @@ int gsrValue = 0;
 float gsrVoltage = 0.0;
 float gsrResistance = 0.0;
 
-// Timing variables - CHANGED TO 30 SECONDS
+// Timing variables 
 unsigned long previousMillis = 0;
-const long interval = 30000;  // Changed from 2000 to 30000 (30 seconds)
+const long interval = 30000;  // 30000 (30 seconds)
 
 // Debug variables
 bool heartRateWorking = false;
@@ -162,13 +162,7 @@ void setup()
   //Serial.println(tempWorking ? "WORKING" : "FAILED");
   //Serial.println("GSR Sensor: WORKING");
   
-  //Serial.println("=== Instructions ===");
-  //Serial.println("1. Place finger FIRMLY on heart rate sensor");
-  //Serial.println("2. Don't move finger during measurement");
-  //Serial.println("3. Wait 10-15 seconds for stable readings");
-  //Serial.println("4. Ensure DS18B20 has 4.7kΩ pull-up resistor to 3.3V");
-  //Serial.println("5. Readings will be output every 30 seconds");
-  //Serial.println("========================================");
+
 }
 void loop() {
   // Toggle for extra debug messages
@@ -274,7 +268,7 @@ void loop() {
     }
   }
 
-  // Read temperature and GSR at regular intervals - NOW EVERY 30 SECONDS
+  // Read temperature and GSR at regular intervals - EVERY 30 SECONDS
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
@@ -298,7 +292,7 @@ void loop() {
       gsrResistance = 0;
     }
 
-    // ✅ CSV-Formatted Output - NOW EVERY 30 SECONDS
+    // CSV-Formatted Output -  EVERY 30 SECONDS
     Serial.print(currentMillis / 1000); Serial.print(",");     // Time (s)
     Serial.print(beatAvg); Serial.print(",");                 // Heart Rate Avg
     if (tempValid)
@@ -308,7 +302,7 @@ void loop() {
     Serial.print(",");
     Serial.println(gsrValue);                                // GSR raw
 
-    // 🟡 Optional: Add header only once
+    // Optional: Add header only once
     // Serial.println("Time,HR,TEMP,GSR");
   }
 
