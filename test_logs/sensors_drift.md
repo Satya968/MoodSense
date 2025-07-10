@@ -12,17 +12,17 @@ Long-term stability assessment to evaluate sensor performance over extended peri
 ## Results
 
 ### DS18B20 Temperature Sensor
-![DS18B20 Drift](plots/DS18B20_drift.png_drift.png)
+![DS18B20 Drift](plots/DS18B20_drift.png)
 
 **Analysis**: Temperature sensor shows excellent long-term stability with minimal drift over the 15-hour period. Variations primarily correlate with ambient temperature changes.
 
 ### MAX30102 Heart Rate Sensor
-![MAX30102 Drift](plots/MAX30102_drift.png.png)
+![MAX30102 Drift](plots/MAX30102_drift.png)
 
 **Analysis**: Heart rate sensor maintains consistent baseline with natural variations corresponding to sleep-wake cycles. No systematic drift observed.
 
 ### GSR Sensor
-![GSR Drift](plots/GSR_drift.png.png)
+![GSR Drift](plots/GSR_drift.png)
 
 **Analysis**: GSR sensor demonstrates stable baseline with expected variations due to physiological changes during sleep. Drift characteristics within acceptable limits.
 
