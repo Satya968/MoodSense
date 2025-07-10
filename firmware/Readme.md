@@ -5,16 +5,16 @@ This folder contains the Arduino firmware for the mood detection system.
 ## Structure
 
 ### `src/`
-- **`moodSense.ino`** - Main mood detection firmware
+- **[`moodSense.ino`](scr/moodsense.ino)** - Main mood detection firmware
   - **Calibration**: First 2 minutes after startup
   - **Detection**: Mood analysis every 45 minutes
   - **Sampling**: 2 sensor readings collected every minute
 
 ### `data_logging/`
-- **`sensor_logger.ino`** - Data collection firmware for training/testing
+- **[`sensor_logger.ino`](data_logging/sensor_logging.ino)** - Data collection firmware for training/testing
   - Collects 2 sensor readings every minute
   - Outputs data via serial for logging
-- **`csv_generator.py`** - Python script to generate CSV from sensor data
+- **[`csv_generator.py`](data_logging/csv_generator.py)** - Python script to generate CSV from sensor data
   - Runs parallel to Arduino
   - Reads serial data and creates CSV files
   - **Important**: Close Arduino Serial Monitor before running Python script
@@ -35,5 +35,5 @@ python csv_generator.py
 ```
 
 ## Notes
-- Ensure Serial Monitor is closed when using `csv_generator.py`
+- Ensure Serial Monitor is closed when using [`csv_generator.py`](data_logging/csv_generator.py)
 - Python script requires serial access to Arduino
