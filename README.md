@@ -2,7 +2,7 @@
 A Continuous Mood &amp; Mental Health Logger for Remote Patient Monitoring
 ## Overview
 
-This project implements a real-time mood detection system using physiological sensors including GSR (Galvanic Skin Response), heart rate monitoring via MAX30102, and temperature sensing with DS18B20. The system establishes personalized baselines through meditation sessions and uses advanced signal processing algorithms to detect emotional states(Happy-😊,Calm-😌,Sad-😢,Stressed-😰).
+This project implements a real-time mood detection system using physiological sensors including GSR (Galvanic Skin Response), heart rate monitoring via MAX30102, and temperature sensing with DS18B20. The system establishes personalized baselines through meditation sessions and uses advanced signal processing algorithms to detect emotional states(Happy😊, Calm😌, Sad😢, Stressed😰).
 
 ## Features
 
@@ -75,44 +75,70 @@ This project implements a real-time mood detection system using physiological se
 1. Connect sensors to ESP32 according to wiring diagram
 2. Ensure proper power supply and grounding
 3. Verify sensor connectivity and calibration
+4. Test individual sensors by running example codes from their respective libraries to ensure proper functionality
 
 ### Software Installation
-```bash
-# Clone repository
-git clone [repository-url]
 
-# Install dependencies
-pip install -r requirements.txt
+#### For Main MoodSense Application
+1. Navigate to `firmware/src/` directory
+2. Open [`moodSense.ino`](firmware/src/moodSense.ino) in Arduino IDE
+3. Download and install the following Arduino libraries:
+   - WiFi
+   - WebServer
+   - ArduinoJson
+   - Wire
+   - MAX30105
+   - OneWire
+   - DallasTemperature
+   - math
+4. Upload the code to ESP32
 
-# Flash ESP32 firmware
-# [Include specific flashing instructions]
-```
+#### For Data Logging
+1. Navigate to `firmware/data_logging/` directory
+2. Open [`sensor_logger.ino`](firmware/data_logging/sensor_logger.ino) in Arduino IDE
+3. Download and install the following Arduino libraries:
+   - Wire
+   - MAX30105
+   - OneWire
+   - DallasTemperature
+4. Upload the code to ESP32
+
+#### For CSV Data Generation
+1. Navigate to `firmware/data_logging/` directory
+2. Install Python dependencies for [`csv_generator.py`](firmware/data_logging/csv_generator.py):
+   - serial
+   - csv
+   - os
+   - datetime
+3. Run the Python script to generate CSV files from sensor data
 
 ### Network Configuration
 1. Configure Wi-Fi credentials in ESP32 code
 2. Deploy web interface to local network
-3. Access dashboard via provided IP address
+3. Access dashboard via provided IP address in Serial Monitor
 
 ## Usage
 
 ### Initial Calibration
 1. Power on the system
 2. Follow meditation guide for baseline establishment
-3. Confirm successful calibration
+3. Check the web dashboard for calibration status
 
 ### Continuous Monitoring
 1. Wear sensors as instructed
 2. Access web dashboard for real-time monitoring
-3. Review mood detection results every 45 minutes
+3. View mood detection results every 45 minutes
 
 ## Data Output
 
 ### Sensor Data
+(by using [`sensor_logger.ino`](firmware/data_logging/sensor_logger.ino),[`csv_generator.py`](firmware/data_logging/csv_generator.py))
 - **Format**: CSV with timestamps
 - **Frequency**: 2 readings per minute
 - **Parameters**: GSR, heart rate, temperature, current consumption
 
 ### Mood Detection
+(by using [`moodSense.ino`](firmware/src/moodSense.ino))
 - **Frequency**: Every 45 minutes
 - **Output**: Classified mood state with confidence metrics
 - **Logging**: Comprehensive mood history with timestamps
@@ -120,81 +146,40 @@ pip install -r requirements.txt
 ## Technical Specifications
 
 ### Sensor Specifications
-- **GSR**: [Include range and accuracy]
-- **MAX30102**: Heart rate ±2 BPM, SpO2 ±2%
+- **GSR**: any value between 0-4095
+- **MAX30102**: Heart rate ±3 BPM
 - **DS18B20**: ±0.5°C accuracy
 
 ### Performance Metrics
-- **Detection Latency**: < 1 second
-- **Power Consumption**: [Include measured values]
+- **Power Consumption**: 1.28A at 3.3V input voltage(5v was also applied for some time)
 - **Continuous Operation**: 12+ hours validated
 
-## Problems Faced and Solutions We Came Up With
+# Development Challenges and Solutions
 
-### Current Limitations
-- **GSR Sensitivity**: Readings affected by contact pressure
-- **Individual Variations**: Person-to-person baseline differences
-- **Environmental Factors**: Temperature and humidity sensitivity
+## Technical Problems Encountered During Development
 
-### Mitigation Strategies
-- **Pressure Calibration**: Standardized sensor placement protocol
-- **Personalized Baselines**: Individual calibration requirement
-- **Environmental Monitoring**: Ambient condition logging
+### GSR Sensor Pressure Dependency
+- **Problem**: GSR sensor readings were highly dependent on the pressure applied to the sensor, causing inconsistent and unreliable measurements
+- **Solution**: Implemented differential analysis using baseline-established values to eliminate pressure variations and provide more stable readings
+
+### Heart Rate Sensor Accuracy Issues
+- **Problem**: Using SparkFun example code for MAX30102 heart rate sensor resulted in consistently high readings (mostly >100 BPM) that were not accurate
+- **Solution**: Developed custom algorithm based on heart rate plotter example code to achieve better accuracy and more realistic heart rate measurements
+
+### Mobile App Development Constraints
+- **Problem**: Team lacked iOS app development experience and faced time constraints for developing a native mobile application
+- **Alternative Solution**: Pivoted to web-based interface where ESP32 connects to personal hotspot and sends data to phone via web dashboard, providing cross-platform accessibility and alos enabling **Remote Patient Monitoring**
+
+### Initial Algorithm Limitations
+- **Problem**: Started with simple mathematical methods (averages, basic calculations) for mood detection algorithm, which failed to provide adequate accuracy
+- **Solution**: Developed advanced algorithm using Z-score concept for better statistical analysis and improved mood classification accuracy
 
 ## Future Enhancements
 
-### Planned Improvements
 - **Mobile Application**: Native iOS/Android app development
-- **Extended Sensor Suite**: Additional physiological parameters
-- **Machine Learning Integration**: Advanced pattern recognition
-- **Cloud Connectivity**: Remote monitoring capabilities
-
-### Research Directions
-- **Long-term Studies**: Extended validation periods
-- **Population Studies**: Demographic-specific calibration
-- **Clinical Validation**: Medical-grade accuracy assessment
-
-## Challenges and Solutions
-
-### Technical Challenges Encountered
-
-#### Heart Rate Sensor Integration
-- **Challenge**: Initial MAX30102 implementation using SparkFun examples showed impractical results
-- **Solution**: Developed custom algorithm based on heart rate plotter examples
-- **Timeline**: 2 days of troubleshooting and optimization
-
-#### Mobile App Development
-- **Challenge**: iOS development complexity with team's Android experience
-- **Solution**: Pivoted to web-based interface accessible via browser
-- **Advantage**: Cross-platform compatibility and easier deployment
-
-#### GSR Signal Processing
-- **Challenge**: Pressure-dependent readings and inter-individual variations
-- **Solution**: Implemented differential analysis and personalized baseline calibration
-- **Result**: Improved accuracy and reduced false positives
-
-### Ongoing Challenges
-- **Sensor Fusion**: Optimizing multi-sensor data integration
-- **Real-time Processing**: Balancing accuracy with response time
-- **User Experience**: Simplifying calibration procedures
-
-## Contributing
-
-### Development Guidelines
-- Follow established coding standards
-- Document all sensor calibration procedures
-- Validate changes against reference devices
-- Maintain comprehensive test coverage
-
-### Testing Requirements
-- Hardware-in-the-loop validation
-- Cross-platform compatibility testing
-- Performance benchmarking
-- User acceptance testing
-
-## License
-
-[Include appropriate license information]
+- **Dataset Analysis**: Analyze more datasets to find perfect thresholds for improved mood detection accuracy
+- **Algorithm Exploration**: Experiment with different algorithms beyond current Z-score approach for better performance
+- **Dynamic Feedback System**: Ask users to verify detected moods at specific intervals and adjust thresholds dynamically based on feedback
 
 ## Acknowledgments
 
@@ -203,9 +188,9 @@ pip install -r requirements.txt
 - Open-source community for reference implementations
 
 ## Contact Information
-
-[Include team contact details]
+- Satyaram Mangena --- Satyaram.Mangena@iiitb.ac.in (Lead)
+- Nihit Reddy --- Nihit.Reddy@iiitb.ac.in (Developer)
+- Lithin Sai Kumar--- Lithin.SaiKumar@iiitb.ac.in(Tester)
 
 ---
 
-**Note**: This system is designed for research and development purposes. For medical or clinical applications, additional validation and regulatory approval may be required.
