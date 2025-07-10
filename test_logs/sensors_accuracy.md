@@ -43,4 +43,4 @@
 Both validated sensors demonstrate acceptable accuracy for physiological monitoring applications. The temperature sensor shows exceptional precision, while the heart rate sensor provides reliable measurements within clinical standards.
 
 ## Data Files
-- [`sensors_accuracy.csv`](/sensors_accuracy_1hr.csv) - Raw validation data for all tested sensors
+- [`sensors_accuracy.csv`](sensors_accuracy_1hr.csv) - Raw validation data for all tested sensors
