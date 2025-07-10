@@ -5,7 +5,7 @@ This folder contains the Arduino firmware for the mood detection system.
 ## Structure
 
 ### `src/`
-- **[`moodSense.ino`](firmware/scr/moodSense.ino)** - Main mood detection firmware
+- **[`moodSense.ino`](src/moodSense.ino)** - Main mood detection firmware
   - **Calibration**: First 2 minutes after startup
   - **Detection**: Mood analysis every 45 minutes
   - **Sampling**: 2 sensor readings collected every minute
