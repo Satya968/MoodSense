@@ -11,7 +11,7 @@ This folder contains the Arduino firmware for the mood detection system.
   - **Sampling**: 2 sensor readings collected every minute
 
 ### `data_logging/`
-- **[`sensor_logger.ino`](data_logging/sensor_logging.ino)** - Data collection firmware for training/testing
+- **[`sensor_logger.ino`](data_logging/sensor_logger.ino)** - Data collection firmware for training/testing
   - Collects 2 sensor readings every minute
   - Outputs data via serial for logging
 - **[`csv_generator.py`](data_logging/csv_generator.py)** - Python script to generate CSV from sensor data
