@@ -1,8 +1,5 @@
 # MoodSense
-Continuous Mood &amp; Mental Health Logger for Remote Patient Monitoring
-# try
-# Physiological Mood Detection System
-
+A Continuous Mood &amp; Mental Health Logger for Remote Patient Monitoring
 ## Overview
 
 This project implements a real-time mood detection system using physiological sensors including GSR (Galvanic Skin Response), heart rate monitoring via MAX30102, and temperature sensing with DS18B20. The system establishes personalized baselines through meditation sessions and uses advanced signal processing algorithms to detect emotional states.
