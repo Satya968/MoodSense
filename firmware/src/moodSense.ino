@@ -21,7 +21,7 @@
   -REQUIRED: 4.7kΩ pull-up resistor between data and 3.3V
   
   GSR Sensor:
-  -Signal = GPIO 36 (A0 equivalent)
+  -Signal = GPIO 36
   -VCC = 3.3V
   -GND = GND
 */
@@ -46,7 +46,7 @@ const char* password = "mmmmmmmm";
 // Web server on port 80
 WebServer server(80);
 
-// Heart rate sensor setup - CUSTOM ALGORITHM (FIXED)
+// Heart rate sensor setup - CUSTOM ALGORITHM
 MAX30105 particleSensor;
 const byte RATE_SIZE = 8;
 byte rates[RATE_SIZE];
@@ -103,7 +103,7 @@ bool tempWorking = false;
 unsigned long lastHeartbeat = 0;
 int consecutiveBeats = 0;
 
-// === ENHANCED MOOD DETECTION SYSTEM ===
+//  ENHANCED MOOD DETECTION SYSTEM 
 // Calibration and baseline variables
 struct AdaptiveBaseline {
   float heart_rate_baseline;
@@ -135,19 +135,19 @@ float gsr_samples[SAMPLES_PER_45MIN];
 
 struct ImprovedMoodThresholds {
   // More realistic z-score thresholds
-  float calm_hr_max = 0.8;      // Increased from 0.5
-  float calm_temp_max = 0.6;    // Increased from 0.3
-  float calm_gsr_max = 0.7;     // Increased from 0.4
+  float calm_hr_max = 0.8;      
+  float calm_temp_max = 0.6;    
+  float calm_gsr_max = 0.7;     
   
-  float stressed_hr_min = 1.8;   // Increased from 1.2
-  float stressed_temp_min = 1.2; // Increased from 0.8
-  float stressed_gsr_min = 1.5;  // Increased from 1.0
+  float stressed_hr_min = 1.8;   
+  float stressed_temp_min = 1.2; 
+  float stressed_gsr_min = 1.5;  
   
   float sad_hr_range_low = -0.8;  // Wider range
   float sad_hr_range_high = 1.2;
   float sad_temp_range_low = -0.5;
   float sad_temp_range_high = 0.8;
-  float sad_gsr_min = 0.9;       // Increased from 0.6
+  float sad_gsr_min = 0.9;       
   
   float happy_hr_range_low = 0.4;
   float happy_hr_range_high = 1.6;
@@ -482,7 +482,7 @@ void initializeAdaptiveBaseline() {
 }
 
 void performImprovedCalibration(unsigned long current_time) {
-  // Extended calibration period to 2 minutes for better baseline
+  // calibration period of 2 minutes for baseline
   if (current_time - calibration_start_time >= 120000) { // 2 minutes
     calculateAdaptiveBaseline();
     current_state = MONITORING;
@@ -720,7 +720,7 @@ String improvedMoodDetection() {
   if (max_score == scores.sad_score) return "Sad";
   if (max_score == scores.happy_score) return "Happy";
   
-  return "Calm";  // Fallback
+  return "Calm";  
 }
 
 float calculateVariability(float samples[], float mean) {
@@ -757,7 +757,7 @@ void setup() {
   Wire.begin();
   delay(100);
   
-  // Initialize sensors with better error handling
+  // Initialize sensors with error handling
   Serial.println("Initializing MAX30102 Heart Rate Sensor...");
   if (!particleSensor.begin(Wire, I2C_SPEED_STANDARD)) {
     Serial.println("ERROR: MAX30102 not found! Check wiring:");
@@ -782,7 +782,7 @@ void setup() {
     smoothBuffer[i] = 0;
   }
   
-  // Initialize temperature sensor with better error handling
+  // Initialize temperature sensor with error handling
   Serial.println("Initializing DS18B20 Temperature Sensor...");
   sensors.begin();
   int deviceCount = sensors.getDeviceCount();
@@ -823,7 +823,7 @@ void setup() {
   // Initialize enhanced mood detection system
   initializeAdaptiveBaseline();
   
-  // Initialize WiFi - THIS SECTION WAS MISPLACED
+  // Initialize WiFi 
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
   
@@ -977,7 +977,7 @@ void loop() {
 
 void performMoodDetection(unsigned long current_time) {
   if (current_state == CALIBRATING) {
-  performImprovedCalibration(current_time);  // Changed function name
+  performImprovedCalibration(current_time);  
 } else if (current_state == MONITORING) {
     performMonitoring(current_time);
   }
@@ -1021,10 +1021,4 @@ void performMonitoring(unsigned long current_time) {
 
 
 
-// Update baseline continuously with new measurements
 
-
-// Improved mood detection with multiple factors
-
-
-// Calculate variability (standard deviation) of samples
