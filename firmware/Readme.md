@@ -37,4 +37,4 @@ python csv_generator.py
 ## Notes
 - Ensure Serial Monitor is closed when using [`csv_generator.py`](data_logging/csv_generator.py)
 - Python script requires serial access to Arduino
-- Change the port number as per your connections
+- Change the port number as per your connections in [`csv_generator.py`](data_logging/csv_generator.py)
