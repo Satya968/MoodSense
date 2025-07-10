@@ -1,6 +1,4 @@
 # Pin Mapping Configuration for ESP32 Sensor Array
-# Project: Health Monitoring System
-# Date: July 10, 2025
 # Microcontroller: ESP32
 
 # ======================================
