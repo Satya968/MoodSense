@@ -2,7 +2,7 @@
 A Continuous Mood &amp; Mental Health Logger for Remote Patient Monitoring
 ## Overview
 
-This project implements a real-time mood detection system using physiological sensors including GSR (Galvanic Skin Response), heart rate monitoring via MAX30102, and temperature sensing with DS18B20. The system establishes personalized baselines through meditation sessions and uses advanced signal processing algorithms to detect emotional states.
+This project implements a real-time mood detection system using physiological sensors including GSR (Galvanic Skin Response), heart rate monitoring via MAX30102, and temperature sensing with DS18B20. The system establishes personalized baselines through meditation sessions and uses advanced signal processing algorithms to detect emotional states(Happy-😊,Calm-😌,Sad-😢,Stressed-😰).
 
 ## Features
 
