@@ -188,7 +188,7 @@ This project implements a real-time mood detection system using physiological se
 ## Contact Information
 - Satyaram Mangena --- Satyaram.Mangena@iiitb.ac.in (Lead)
 - Nihit Reddy --- Nihit.Reddy@iiitb.ac.in (Developer)
-- Lithin Sai Kumar--- Lithin.SaiKumar@iiitb.ac.in(Tester)
+- Lithin Sai Kumar--- Lithin.SaiKumar@iiitb.ac.in (Tester)
 
 ---
 
