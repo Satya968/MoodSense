@@ -154,9 +154,7 @@ This project implements a real-time mood detection system using physiological se
 - **Power Consumption**: 1.28A at 3.3V input voltage(5v was also applied for some time)
 - **Continuous Operation**: 12+ hours validated
 
-# Development Challenges and Solutions
-
-## Technical Problems Encountered During Development
+## Development Challenges and Solutions
 
 ### GSR Sensor Pressure Dependency
 - **Problem**: GSR sensor readings were highly dependent on the pressure applied to the sensor, causing inconsistent and unreliable measurements
