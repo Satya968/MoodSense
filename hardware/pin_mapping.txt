@@ -1,0 +1,60 @@
+# Pin Mapping Configuration for ESP32 Sensor Array
+# Project: Health Monitoring System
+# Date: July 10, 2025
+# Microcontroller: ESP32
+
+# ======================================
+# POWER CONNECTIONS
+# ======================================
+VCC_SUPPLY = 3.3V
+GND_SUPPLY = GND
+
+# ======================================
+# SENSOR PIN MAPPINGS
+# ======================================
+
+# MAX30102 - Heart Rate & SpO2 Sensor
+MAX30102_VCC = 3.3V
+MAX30102_GND = GND
+MAX30102_SDA = GPIO21
+MAX30102_SCL = GPIO22
+MAX30102_FUNCTION = I2C_HR_SpO2_data
+
+# DS18B20 - Temperature Sensor
+DS18B20_VCC = 3.3V
+DS18B20_GND = GND
+DS18B20_DATA = GPIO13
+DS18B20_PULLUP = 4.7kΩ_to_3.3V
+DS18B20_FUNCTION = Skin_temp_sensing_with_pullup
+
+# GSR V2 Module - Galvanic Skin Response
+GSR_V2_VCC = 3.3V
+GSR_V2_GND = GND
+GSR_V2_OUT = GPIO36
+GSR_V2_FUNCTION = Analog_skin_conductance_reading_0_to_4095
+
+# ======================================
+# I2C BUS CONFIGURATION
+# ======================================
+I2C_SDA_PIN = GPIO21
+I2C_SCL_PIN = GPIO22
+I2C_DEVICES = MAX30102
+
+# ======================================
+# ANALOG INPUTS
+# ======================================
+ADC_CHANNEL_0 = GPIO36 (GSR_V2_OUT, range 0-4095, VP pin)
+
+# ======================================
+# DIGITAL INPUTS
+# ======================================
+ONEWIRE_BUS = GPIO13 (DS18B20_DATA)
+
+# ======================================
+# NOTES
+# ======================================
+# - All sensors powered at 3.3V for compatibility with ESP32
+# - DS18B20 requires 4.7kΩ pullup resistor on data line
+# - MAX30102 communicates via I2C protocol
+# - GSR V2 provides analog output with ADC values 0-4095
+# - Ensure proper power supply regulation for stable readings
