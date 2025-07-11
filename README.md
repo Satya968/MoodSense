@@ -67,7 +67,7 @@ This project implements a real-time mood detection system using physiological se
 ### Real-world Testing
 - **Duration**: 12-hour continuous operation
 - **Mood Logging**: Manual mood verification every 45 minutes
-- **Accuracy**: Achieved X% accuracy against ground truth
+- **Accuracy**: Achieved `50`% accuracy against ground truth
 
 ## Installation and Setup
 
