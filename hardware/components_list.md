@@ -14,4 +14,4 @@
 | 10 | TP4056-TC | Battery Charging Module | Li-ion Charger, USB Type-C, 1A Current | 1 | 30.00 | 30.00 |
 | 11 | TEMP-GUN-IR | Temp Gun | -50°C to +550°C, ±1.5°C Accuracy | 1 | 753.00 | 753.00 |
 
-**Total Project Cost: ₹2,583.00**
+**Total Project Cost: ₹2,628.00**
