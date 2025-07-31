@@ -19,6 +19,10 @@ This folder contains the Arduino firmware for the mood detection system.
   - Reads serial data and creates CSV files
   - **Important**: Close Arduino Serial Monitor before running Python script
 
+### `app/`
+- **[`Info.plist`](app/Info.plist)**
+- **[`pubspec.yaml`](app/pubspec.yaml)**
+- **[`main.dart`](app/main.dart)**
 ## Usage
 
 **For mood detection:**
