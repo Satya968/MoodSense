@@ -137,18 +137,10 @@ cd firmware/src/
 
 #### Flutter iOS Application
 ```bash
-# Navigate to mobile app directory
-cd firmware/app/
+# Navigate to mobile app directory firmware/app/ and follow readme.md
 
 # Flutter dependencies:
 flutter pub get
-
-# Required packages (pubspec.yaml):
-- flutter_bluetooth_serial
-- charts_flutter
-- pdf
-- path_provider
-- share_plus
 
 # Build and install on iOS device
 flutter build ios
@@ -164,7 +156,37 @@ flutter install
 
 ---
 
-## 📱 **Usage for Addiction Recovery**
+## **Data Output & Daily Report Generation**
+
+### iOS App Features & Daily Reports
+- **Real-Time Monitoring**: Live sensor data display with Bluetooth connectivity
+- **Daily Report Button**: One-click generation of comprehensive daily analytics
+- **Visual Analytics**: Four detailed graphs showing sensor trends and mood fluctuations
+- **Data Tables**: Complete tabulated data with timestamps for clinical use
+
+### Comprehensive Daily Report Contents
+
+#### **Four Visual Graphs**
+1. **GSR (Galvanic Skin Response) Trends**: 24-hour skin conductance patterns
+2. **Heart Rate Variability**: Heart rate fluctuations throughout the day
+3. **Body Temperature Changes**: Temperature variations and patterns
+4. **Mood Fluctuation Timeline**: Mood state changes with timestamps
+
+#### **Detailed Data Tables**
+- **Sensor Readings**: Complete timestamp data for all three sensors
+- **Mood Classifications**: Timestamped mood states with confidence levels
+- **Statistical Summary**: Daily averages, peaks, and pattern analysis
+- **Session Metadata**: Calibration status and data quality metrics
+
+### Data Export & Clinical Integration
+- **PDF Report Generation**: Professional reports for clinical appointments
+- **Data Sharing**: Easy sharing via email or messaging apps
+- **Local Storage**: Secure on-device data storage with privacy protection
+- **Clinical Compatibility**: Reports formatted for healthcare provider review
+
+---
+
+## **Usage for Addiction Recovery**
 
 ### Initial Setup & Calibration
 
@@ -172,7 +194,7 @@ flutter install
    - Perform 1-2 minute guided meditation session
    - System records stable physiological readings
    - Personalized thresholds calculated automatically
-   - Calibration status displayed on web dashboard
+   - Calibration status displayed on app UI
 
 2. **Continuous Mood Logging**
    - Wear sensors during daily activities
@@ -180,7 +202,7 @@ flutter install
    - Data streams to iOS app via Bluetooth
    - Mood classification performed every 45 minutes
    - All data stored locally on mobile device
-
+     
 ### Clinical Integration
 
 #### For Healthcare Providers
@@ -203,37 +225,7 @@ flutter install
 
 ---
 
-## 📈 **Data Output & Daily Report Generation**
-
-### iOS App Features & Daily Reports
-- **Real-Time Monitoring**: Live sensor data display with Bluetooth connectivity
-- **Daily Report Button**: One-click generation of comprehensive daily analytics
-- **Visual Analytics**: Four detailed graphs showing sensor trends and mood fluctuations
-- **Data Tables**: Complete tabulated data with timestamps for clinical use
-
-### Comprehensive Daily Report Contents
-
-#### 📊 **Four Visual Graphs**
-1. **GSR (Galvanic Skin Response) Trends**: 24-hour skin conductance patterns
-2. **Heart Rate Variability**: Heart rate fluctuations throughout the day
-3. **Body Temperature Changes**: Temperature variations and patterns
-4. **Mood Fluctuation Timeline**: Mood state changes with timestamps
-
-#### 📋 **Detailed Data Tables**
-- **Sensor Readings**: Complete timestamp data for all three sensors
-- **Mood Classifications**: Timestamped mood states with confidence levels
-- **Statistical Summary**: Daily averages, peaks, and pattern analysis
-- **Session Metadata**: Calibration status and data quality metrics
-
-### Data Export & Clinical Integration
-- **PDF Report Generation**: Professional reports for clinical appointments
-- **Data Sharing**: Easy sharing via email or messaging apps
-- **Local Storage**: Secure on-device data storage with privacy protection
-- **Clinical Compatibility**: Reports formatted for healthcare provider review
-
----
-
-## 🚀 **Future Development for Recovery Applications**
+##  **Future Development for Recovery Applications**
 
 ### Enhanced Clinical Features
 - **Extended Historical Analysis**: Longer-term mood pattern analysis (months/years)
@@ -261,7 +253,7 @@ flutter install
 
 ---
 
-## 🔧 **Technical Challenges & Solutions**
+## **Technical Challenges & Solutions**
 
 ### Sensor Reliability Issues
 
@@ -294,7 +286,7 @@ flutter install
 
 ---
 
-## 🏥 **Clinical Impact & Applications**
+## **Clinical Impact & Applications**
 
 ### Evidence-Based Recovery Support
 
@@ -326,7 +318,6 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 - **Addiction Recovery Community** - Inspiration and feedback for clinical applications
 - **Sensor Manufacturers** - Technical documentation and support  
 - **Open Source Community** - Reference implementations and collaborative development
-- **Clinical Advisors** - Guidance on addiction recovery best practices
 
 ---
 
