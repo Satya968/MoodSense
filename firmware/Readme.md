@@ -38,6 +38,18 @@ This folder contains the Arduino firmware for the mood detection system.
 python csv_generator.py
 ```
 
+**For app:**
+```bash
+#Create a new flutter folder
+flutter create app_name
+
+#replace Info.plist,pubspec.yaml and main.dart
+
+#run
+flutter pub get
+flutter run
+
+
 ## Notes
 - Ensure Serial Monitor is closed when using [`csv_generator.py`](data_logging/csv_generator.py)
 - Python script requires serial access to Arduino
