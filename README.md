@@ -1,14 +1,14 @@
 # **MoodSense**
 
 **A Real-Time Physiological Monitoring System for Relapse Prevention and Recovery Support in deaddiction phase**
-##  🎯 **Overview-Revolutionizing Addiction Recovery Through Continuous Mood Surveillance**
+##**Overview-Revolutionizing Addiction Recovery Through Continuous Mood Surveillance**
 MoodSense addresses one of the most critical challenges in addiction recovery: **objective tracking and reporting of mood patterns over time**. Mood disorders, including depression and bipolar disorders, are the most common psychiatric comorbidities among patients with substance use disorders, making continuous mood monitoring essential for successful recovery outcomes.
 
 Our system leverages multi-sensor physiological data to provide objective mood history and patterns, enabling healthcare providers, counselors, and individuals in recovery to understand emotional trends and make informed decisions about treatment and support strategies.
 
 ---
 
-## 🔬 **The Science Behind Addiction & Mood Monitoring**
+## **The Science Behind Addiction & Mood Monitoring**
 
 ### Why Mood Monitoring Matters in Recovery
 
@@ -26,7 +26,7 @@ Biosensors embedded in wearable devices can continuously monitor the physiologic
 
 ---
 
-## 🧠 **How MoodSense Works**
+## **How MoodSense Works**
 
 ### Multi-Sensor Physiological Monitoring
 
@@ -50,14 +50,14 @@ The system employs Z-score statistical analysis and threshold-based algorithms t
 
 ---
 
-## 🛠 **Technical Implementation**
+## **Technical Implementation**
 
 ### Hardware Components
 
 | Component | Function | Specification |
 |-----------|----------|---------------|
 | **ESP32 Microcontroller** | Main processing unit | Wi-Fi enabled, real-time data processing |
-| **MAX30102 Sensor** | Heart rate & SpO2 monitoring | ±3 BPM accuracy, validated against commercial devices |
+| **MAX30102 Sensor** | Heart rate monitoring | ±3 BPM accuracy, validated against commercial devices |
 | **DS18B20 Sensor** | Body temperature sensing | ±0.5°C accuracy, drift-characterized |
 | **GSR Sensor Module** | Skin conductance measurement | 0-4095 range, pressure-compensated algorithm |
 
@@ -72,7 +72,7 @@ The system employs Z-score statistical analysis and threshold-based algorithms t
 
 ---
 
-## 📊 **Sensor Characterization & Validation**
+## **Sensor Characterization & Validation**
 
 ### Comprehensive Sensor Testing
 
@@ -94,20 +94,20 @@ The system employs Z-score statistical analysis and threshold-based algorithms t
 
 ### Long-term Stability Testing
 
+#### 15-Hour Sensor Drift Analysis
+- **Focus**: Long-term sensor stability ,sensor drift and calibration maintenance
+- **Outcome**: Comprehensive drift characterization for all sensors
+  
 #### 12-Hour Continuous Operation Test
-- **Purpose**: Validate system stability and sensor drift
+- **Purpose**: Validate system stability
 - **Parameters Monitored**: All sensors simultaneously
 - **Results**: Stable operation with minimal drift
-- **Data Collection**: 2 readings per minute (2,880 data points total)
+- **Data Collection**: 2 readings per minute (2,880 data points total) and mood detected once in every 45 minutes 
 
-#### 15-Hour Sensor Drift Analysis
-- **Focus**: Long-term sensor stability and calibration maintenance
-- **Outcome**: Comprehensive drift characterization for all sensors
-- **Application**: Automatic drift compensation algorithms
 
 ---
 
-## 🔧 **Installation & Setup**
+## **Installation & Setup**
 
 ### Hardware Assembly
 
@@ -138,7 +138,7 @@ cd firmware/src/
 #### Flutter iOS Application
 ```bash
 # Navigate to mobile app directory
-cd mobile_app/
+cd firmware/app/
 
 # Flutter dependencies:
 flutter pub get
