@@ -134,6 +134,24 @@ cd firmware/src/
 
 # Upload moodSense.ino to ESP32 (with Bluetooth enabled)
 ```
+#### For Data Logging
+1.⁠ ⁠Navigate to ⁠ firmware/data_logging/ ⁠ directory
+2.⁠ ⁠Open [⁠ sensor_logger.ino ⁠](firmware/data_logging/sensor_logger.ino) in Arduino IDE
+3.⁠ ⁠Download and install the following Arduino libraries:
+   - Wire
+   - MAX30105
+   - OneWire
+   - DallasTemperature
+4.⁠ ⁠Upload the code to ESP32
+
+#### For CSV Data Generation
+1.⁠ ⁠Navigate to ⁠ firmware/data_logging/ ⁠ directory
+2.⁠ ⁠Install Python dependencies for [⁠ csv_generator.py ⁠](firmware/data_logging/csv_generator.py):
+   - serial
+   - csv
+   - os
+   - datetime
+3.⁠ ⁠Run the Python script to generate CSV files from sensor data
 
 #### Flutter iOS Application
 ```bash
