@@ -45,10 +45,6 @@ flutter create app_name
 
 #replace Info.plist,pubspec.yaml and main.dart
 
-#run
-flutter pub get
-flutter run
-```
 
 ## Notes
 - Ensure Serial Monitor is closed when using [`csv_generator.py`](data_logging/csv_generator.py)
