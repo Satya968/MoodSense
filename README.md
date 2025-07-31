@@ -1,5 +1,3 @@
-# MoodSense: Physiological Mood Monitoring for Addiction Recovery
-
 ## 🎯 **Revolutionizing Addiction Recovery Through Continuous Mood Surveillance**
 
 **A Real-Time Physiological Monitoring System for Relapse Prevention and Recovery Support**
@@ -68,8 +66,8 @@ The system employs Z-score statistical analysis and threshold-based algorithms t
 - **Sampling Rate**: 30-second intervals for comprehensive monitoring
 - **Detection Frequency**: Mood classification every 45 minutes
 - **Power Consumption**: 1.28A at 3.3V (12+ hours continuous operation)
-- **Connectivity**: Wi-Fi enabled for remote monitoring
-- **Data Storage**: CSV export capability for clinical analysis
+- **Connectivity**: Bluetooth enabled for mobile app integration
+- **Data Storage**: Local storage on mobile device with daily report generation
 - **Accuracy**: 50% accuracy against ground truth validation
 
 ---
@@ -126,8 +124,7 @@ The system employs Z-score statistical analysis and threshold-based algorithms t
 cd firmware/src/
 
 # Required Arduino Libraries:
-- WiFi
-- WebServer  
+- BluetoothSerial
 - ArduinoJson
 - Wire
 - MAX30105
@@ -135,29 +132,35 @@ cd firmware/src/
 - DallasTemperature
 - math
 
-# Upload moodSense.ino to ESP32
+# Upload moodSense.ino to ESP32 (with Bluetooth enabled)
 ```
 
-#### Data Logging System
+#### Flutter iOS Application
 ```bash
-# Navigate to data logging directory  
-cd firmware/data_logging/
+# Navigate to mobile app directory
+cd mobile_app/
 
-# Upload sensor_logger.ino to ESP32
+# Flutter dependencies:
+flutter pub get
 
-# Python dependencies for CSV generation:
-pip install serial csv os datetime
+# Required packages (pubspec.yaml):
+- flutter_bluetooth_serial
+- charts_flutter
+- pdf
+- path_provider
+- share_plus
 
-# Run CSV generator
-python csv_generator.py
+# Build and install on iOS device
+flutter build ios
+flutter install
 ```
 
-### Network Configuration
+### Mobile App Configuration
 
-1. **Wi-Fi Setup**: Configure network credentials in ESP32 code
-2. **Web Interface**: Deploy dashboard to local network
-3. **Remote Access**: Connect via IP address shown in Serial Monitor
-4. **Mobile Integration**: Access through smartphone browser for portability
+1. **Bluetooth Pairing**: Pair ESP32 device with iOS device
+2. **App Installation**: Install MoodSense Flutter app on iOS device
+3. **Device Connection**: Connect to ESP32 via Bluetooth within the app
+4. **Data Synchronization**: Real-time sensor data streaming to mobile device
 
 ---
 
@@ -173,51 +176,60 @@ python csv_generator.py
 
 2. **Continuous Mood Logging**
    - Wear sensors during daily activities
-   - System provides continuous 30-second sampling
-   - Mood classification every 45 minutes
-   - Historical mood data available on web dashboard
+   - ESP32 continuously samples sensors every 30 seconds
+   - Data streams to iOS app via Bluetooth
+   - Mood classification performed every 45 minutes
+   - All data stored locally on mobile device
 
 ### Clinical Integration
 
 #### For Healthcare Providers
-- **Historical Mood Analysis**: Review patient mood patterns from past days/weeks
+- **Daily Report Review**: Receive comprehensive daily reports from patients
 - **Objective Assessment**: Supplement subjective reports with physiological mood history
 - **Treatment Evaluation**: Assess how different treatments affected mood over time
-- **Session Preparation**: Review recent mood trends before patient appointments
+- **Appointment Preparation**: Review detailed sensor data and mood patterns before sessions
 
 #### For Recovery Counselors
-- **Session Enhancement**: Discuss actual mood patterns rather than recalled emotions
-- **Progress Tracking**: Show concrete evidence of emotional stability improvements
-- **Trigger Analysis**: Correlate past mood changes with life events or circumstances
-- **Treatment Planning**: Use mood history to adjust counseling approaches
+- **Session Enhancement**: Discuss actual mood patterns using detailed daily reports
+- **Progress Tracking**: Show concrete evidence of emotional stability improvements through visual graphs
+- **Trigger Analysis**: Correlate past mood changes with life events using timestamped data
+- **Treatment Planning**: Use comprehensive daily statistics to adjust counseling approaches
 
 #### For Individuals in Recovery
-- **Self-Understanding**: See objective records of personal mood patterns
-- **Memory Aid**: Remember emotional experiences that might be forgotten
-- **Recovery Documentation**: Track emotional progress over weeks and months
-- **Awareness Building**: Learn about personal emotional patterns and cycles
+- **Daily Self-Review**: Generate and review daily mood and physiological reports
+- **Memory Aid**: Remember emotional experiences with detailed timestamps and data
+- **Recovery Documentation**: Track emotional progress with visual graphs and statistics
+- **Awareness Building**: Learn about personal patterns through comprehensive daily analytics
 
 ---
 
-## 📈 **Data Output & Analysis**
+## 📈 **Data Output & Daily Report Generation**
 
-### Real-Time Data Collection & Historical Analysis
-- **Web Dashboard**: Current sensor readings and historical mood visualization
-- **Trend Analysis**: Mood patterns over hours, days, and weeks
-- **Historical Review**: Access to past mood states with timestamps
-- **Mobile Access**: Cross-platform compatibility through web interface
+### iOS App Features & Daily Reports
+- **Real-Time Monitoring**: Live sensor data display with Bluetooth connectivity
+- **Daily Report Button**: One-click generation of comprehensive daily analytics
+- **Visual Analytics**: Four detailed graphs showing sensor trends and mood fluctuations
+- **Data Tables**: Complete tabulated data with timestamps for clinical use
 
-### Data Export & Clinical Use
-- **CSV Format**: Comprehensive sensor data with timestamps
-- **Clinical Integration**: Compatible with electronic health records
-- **Research Applications**: Data suitable for clinical studies and analysis
-- **Privacy Protection**: Local data storage with controlled access
+### Comprehensive Daily Report Contents
 
-### Mood Detection Output
-- **Classification**: Happy😊, Calm😌, Sad😢, Stressed😰 states
-- **Confidence Metrics**: Statistical confidence in mood assessment
-- **Historical Logging**: Complete mood history with timestamps
-- **Pattern Recognition**: Identification of recurring mood cycles
+#### 📊 **Four Visual Graphs**
+1. **GSR (Galvanic Skin Response) Trends**: 24-hour skin conductance patterns
+2. **Heart Rate Variability**: Heart rate fluctuations throughout the day
+3. **Body Temperature Changes**: Temperature variations and patterns
+4. **Mood Fluctuation Timeline**: Mood state changes with timestamps
+
+#### 📋 **Detailed Data Tables**
+- **Sensor Readings**: Complete timestamp data for all three sensors
+- **Mood Classifications**: Timestamped mood states with confidence levels
+- **Statistical Summary**: Daily averages, peaks, and pattern analysis
+- **Session Metadata**: Calibration status and data quality metrics
+
+### Data Export & Clinical Integration
+- **PDF Report Generation**: Professional reports for clinical appointments
+- **Data Sharing**: Easy sharing via email or messaging apps
+- **Local Storage**: Secure on-device data storage with privacy protection
+- **Clinical Compatibility**: Reports formatted for healthcare provider review
 
 ---
 
@@ -235,11 +247,11 @@ python csv_generator.py
 - **Pattern Correlation**: Link mood patterns with treatment effectiveness
 - **Recovery Timeline Mapping**: Visual representation of emotional recovery journey
 
-### Mobile Application Development
-- **Native iOS/Android Apps**: Dedicated mobile applications
-- **Historical Mood Review**: Easy access to past mood data
-- **Progress Visualization**: Charts and graphs of mood trends over time
-- **Data Sharing**: Export mood history for clinical appointments
+### Mobile Application Enhancement
+- **Android Version**: Extend Flutter app to Android platform
+- **Advanced Report Features**: Weekly and monthly report generation
+- **Data Synchronization**: Cloud backup and multi-device sync
+- **Enhanced Visualizations**: Interactive charts and trend analysis
 
 ### Research & Validation
 - **Longitudinal Studies**: Support for long-term mood pattern research
@@ -266,9 +278,14 @@ python csv_generator.py
 ### System Integration Challenges
 
 #### Mobile Application Development
-- **Problem**: Team lacked iOS development experience within time constraints
-- **Solution**: Pivoted to web-based interface enabling cross-platform access
-- **Result**: Universal compatibility and enhanced remote monitoring capabilities
+- **Previous Approach**: Web-based interface with Wi-Fi connectivity
+- **New Solution**: Native Flutter iOS app with Bluetooth connectivity for better portability
+- **Result**: Seamless mobile integration with offline capability and professional report generation
+
+#### Data Visualization & Reporting
+- **Challenge**: Providing comprehensive daily analytics for clinical use
+- **Solution**: Implemented one-click daily report generation with four detailed graphs and data tables
+- **Result**: Professional-grade reports suitable for healthcare providers and personal review
 
 #### Algorithm Development
 - **Problem**: Simple mathematical approaches provided inadequate accuracy
@@ -293,6 +310,37 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 
 ---
 
+## 🤝 **Contributing to Recovery Innovation**
+
+### Open Source Collaboration
+- **Research Community**: Collaborate with addiction medicine researchers
+- **Clinical Partnerships**: Work with treatment centers for real-world validation
+- **Technology Development**: Contribute to sensor and algorithm improvements
+- **Patient Advocacy**: Ensure solutions meet real recovery needs
+
+### Academic Partnerships
+- **Clinical Studies**: Support formal research initiatives
+- **Algorithm Development**: Advance machine learning applications
+- **Sensor Innovation**: Improve physiological monitoring accuracy
+- **Recovery Outcomes**: Measure technology impact on treatment success
+
+---
+
+## 📞 **Support & Resources**
+
+### Crisis Resources
+- **SAMHSA National Helpline**: 1-800-662-4357 (Free, confidential, 24/7 treatment referral service)
+- **Emergency Services**: 911 for immediate medical emergencies
+- **Crisis Text Line**: Text HOME to 741741
+
+### Technical Support
+- **Documentation**: Comprehensive setup and troubleshooting guides
+- **Community Forum**: User and developer support community
+- **Clinical Training**: Healthcare provider implementation support
+- **Research Collaboration**: Academic and clinical partnership opportunities
+
+---
+
 ## 👥 **Development Team**
 
 **IIIT Bangalore - ELCIA Sense2Scale 2025 Hackathon**
@@ -313,9 +361,12 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 
 ---
 
+## 📄 **License & Ethical Considerations**
+
+This project is developed for research and clinical applications in addiction recovery. All data handling follows privacy protection guidelines, and the system is designed to complement, not replace, professional medical care and counseling services.
 
 **Disclaimer**: MoodSense is a research tool designed to support addiction recovery efforts. It should not be used as the sole basis for clinical decisions and must be integrated with comprehensive professional treatment programs.
 
 ---
 
-*"Recovery is not a destination, but a journey. MoodSense provides the compass to navigate emotional landscapes with objective insight and professional support."*
+*"Recovery is not a destination, but a journey. MoodSense provides the historical perspective to understand the emotional landscape of that journey with objective insight and professional support."*
