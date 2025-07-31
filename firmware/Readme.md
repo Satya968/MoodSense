@@ -48,7 +48,7 @@ flutter create app_name
 #run
 flutter pub get
 flutter run
-
+```
 
 ## Notes
 - Ensure Serial Monitor is closed when using [`csv_generator.py`](data_logging/csv_generator.py)
