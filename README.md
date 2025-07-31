@@ -1,4 +1,4 @@
-### ***MoodSense***
+# **MoodSense**
 
 **A Real-Time Physiological Monitoring System for Relapse Prevention and Recovery Support**
 ##  🎯 **Overview-Revolutionizing Addiction Recovery Through Continuous Mood Surveillance**
