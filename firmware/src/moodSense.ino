@@ -1,52 +1,20 @@
-/*
-  Combined Health Monitoring System - ESP32 Version with Web Server
-  - Heart Rate Detection using MAX30105 sensor
-  - Temperature reading using DS18B20 sensor  
-  - GSR (Galvanic Skin Response) reading using analog sensor
-  - Web server for mobile app interface
-  - Enhanced mood detection with baseline and z-score analysis
-  
-  Hardware Connections for ESP32:
-  MAX30105 Breakout to ESP32:
-  -3.3V = 3.3V
-  -GND = GND
-  -SDA = GPIO 21 (SDA)
-  -SCL = GPIO 22 (SCL)
-  -INT = Not connected
-  
-  DS18B20 Temperature Sensor:
-  -Data wire = GPIO 13 (D13)
-  -VCC = 3.3V
-  -GND = GND
-  -REQUIRED: 4.7kΩ pull-up resistor between data and 3.3V
-  
-  GSR Sensor:
-  -Signal = GPIO 36
-  -VCC = 3.3V
-  -GND = GND
-*/
-
-#include <WiFi.h>
-#include <WebServer.h>
-#include <ArduinoJson.h>
-#include <math.h>
-
-// Include libraries for heart rate sensor
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
 #include <Wire.h>
 #include "MAX30105.h"
-
-// Include libraries for temperature sensor
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <math.h>
+#include <ArduinoJson.h>
+// BLE Setup
+BLECharacteristic* pCharacteristic = NULL;
+bool deviceConnected = false;
+#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-// WiFi credentials - CHANGE THESE TO YOUR NETWORK
-const char* ssid = "iPhone 17 Pro Max";
-const char* password = "mmmmmmmm";
-
-// Web server on port 80
-WebServer server(80);
-
-// Heart rate sensor setup - CUSTOM ALGORITHM
+// Heart rate sensor setup
 MAX30105 particleSensor;
 const byte RATE_SIZE = 8;
 byte rates[RATE_SIZE];
@@ -93,9 +61,11 @@ int gsrValue = 0;
 float gsrVoltage = 0.0;
 float gsrResistance = 0.0;
 
+#define BATTERY_PIN 33  // GPIO39 (VN port) for charging %
+int currentBattery = 0;
 // Timing variables
 unsigned long previousMillis = 0;
-const long interval = 2000;
+const long interval = 1000;
 
 // Debug variables
 bool heartRateWorking = false;
@@ -103,7 +73,7 @@ bool tempWorking = false;
 unsigned long lastHeartbeat = 0;
 int consecutiveBeats = 0;
 
-//  ENHANCED MOOD DETECTION SYSTEM 
+// ENHANCED MOOD DETECTION SYSTEM 
 // Calibration and baseline variables
 struct AdaptiveBaseline {
   float heart_rate_baseline;
@@ -128,10 +98,10 @@ struct AdaptiveBaseline {
 AdaptiveBaseline adaptive_baseline;
 
 // Data collection arrays for 1-minute windows
-const int SAMPLES_PER_45MIN = 1350; // 1350 samples per 45 minutes (one every 2 seconds)
-float hr_samples[SAMPLES_PER_45MIN];
-float temp_samples[SAMPLES_PER_45MIN];
-float gsr_samples[SAMPLES_PER_45MIN];
+const int SAMPLES_PER_1MIN = 60; // 60 samples per 1 minute (one every 1 second)
+float hr_samples[SAMPLES_PER_1MIN];
+float temp_samples[SAMPLES_PER_1MIN];
+float gsr_samples[SAMPLES_PER_1MIN];
 
 struct ImprovedMoodThresholds {
   // More realistic z-score thresholds
@@ -171,14 +141,73 @@ unsigned long last_sample_time = 0;
 int sample_index = 0;
 bool period_complete = false;
 
-// Current sensor values for web interface
+// Current sensor values
 float currentHR = 0;
 float currentTemp = 0;
 int currentGSR = 0;
 String currentMood = "Calibrating...";
 float moodProgress = 0;
 
-// Function declarations
+// BLE Server Callbacks
+class MyServerCallbacks: public BLEServerCallbacks {
+    void onConnect(BLEServer* pServer) { 
+        deviceConnected = true; 
+        Serial.println("Device connected");
+    };
+    void onDisconnect(BLEServer* pServer) { 
+        deviceConnected = false; 
+        Serial.println("Device disconnected");
+        // Restart advertising
+        BLEDevice::startAdvertising();
+    }
+};
+
+void initializeBLE() {
+    Serial.println("Initializing BLE...");
+    
+    // Initialize BLE Device
+    BLEDevice::init("Health_Monitor_BLE");
+    
+    // Create BLE Server
+    BLEServer *pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new MyServerCallbacks());
+    
+    // Create BLE Service
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    
+    // Create BLE Characteristic
+    pCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID, 
+        BLECharacteristic::PROPERTY_READ | 
+        BLECharacteristic::PROPERTY_WRITE | 
+        BLECharacteristic::PROPERTY_NOTIFY
+    );
+    
+    // Add descriptor for notifications
+    pCharacteristic->addDescriptor(new BLE2902());
+    
+    // Start the service
+    pService->start();
+    
+    // Start advertising
+    BLEDevice::getAdvertising()->addServiceUUID(SERVICE_UUID);
+    BLEDevice::startAdvertising();
+    
+    Serial.println("BLE initialization complete!");
+}
+int getBatteryPercentage(float voltage) {
+  float minVoltage = 3.2;  // Empty
+  float maxVoltage = 4.1;  // Full
+  
+  if (voltage <= minVoltage) return 0;
+  if (voltage >= maxVoltage) return 100;
+  
+  // Calculate percentage
+  int percentage = (voltage - minVoltage) / (maxVoltage - minVoltage) * 100;
+  return percentage;
+}
+
+// Function declarations for mood detection
 void initializeAdaptiveBaseline();
 void performImprovedCalibration(unsigned long current_time);
 void calculateAdaptiveBaseline();
@@ -188,277 +217,6 @@ float calculateVariability(float samples[], float mean);
 void printAdaptiveBaseline();
 void performMoodDetection(unsigned long current_time);
 void performMonitoring(unsigned long current_time);
-
-// Web server functions
-void handleRoot() {
-  String html = R"rawliteral(
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mood Monitor</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: white;
-        }
-        
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .mood-display {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .mood-emoji {
-            font-size: 5em;
-            margin-bottom: 10px;
-        }
-        
-        .mood-text {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff88, #00aa55);
-            transition: width 0.3s ease;
-        }
-        
-        .sensor-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .sensor-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-        }
-        
-        .sensor-title {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-bottom: 10px;
-        }
-        
-        .sensor-value {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        
-        .status {
-            text-align: center;
-            font-size: 1.1em;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-        
-        .refresh-btn {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        
-        .refresh-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .offline {
-            opacity: 0.5;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🧠 Mood Monitor</h1>
-        
-        <div class="mood-display">
-            <div class="mood-emoji" id="moodEmoji">🔄</div>
-            <div class="mood-text" id="moodText">Calibrating...</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
-        </div>
-        
-        <div class="sensor-grid">
-            <div class="sensor-card">
-                <div class="sensor-title">Heart Rate</div>
-                <div class="sensor-value" id="heartRate">--</div>
-                <div style="font-size: 0.8em; opacity: 0.7;">BPM</div>
-            </div>
-            
-            <div class="sensor-card">
-                <div class="sensor-title">Temperature</div>
-                <div class="sensor-value" id="temperature">--</div>
-                <div style="font-size: 0.8em; opacity: 0.7;">°C</div>
-            </div>
-            
-            <div class="sensor-card">
-                <div class="sensor-title">GSR</div>
-                <div class="sensor-value" id="gsr">--</div>
-                <div style="font-size: 0.8em; opacity: 0.7;">Raw</div>
-            </div>
-            
-            <div class="sensor-card">
-                <div class="sensor-title">Status</div>
-                <div class="sensor-value" id="status">--</div>
-            </div>
-        </div>
-        
-        <div class="status" id="statusMessage">Connecting to sensors...</div>
-        
-        <button class="refresh-btn" onclick="refreshData()">Refresh Data</button>
-    </div>
-
-    <script>
-        const moodEmojis = {
-            'Happy': '😊',
-            'Sad': '😢',
-            'Stressed': '😰',
-            'Calm': '😌',
-            'Uncertain': '🤔',
-            'Calibrating...': '🔄',
-            'Monitoring...': '🔍'
-        };
-        
-        function updateMoodDisplay(mood, progress) {
-            document.getElementById('moodEmoji').textContent = moodEmojis[mood] || '🤔';
-            document.getElementById('moodText').textContent = mood;
-            document.getElementById('progressFill').style.width = progress + '%';
-        }
-        
-        function refreshData() {
-            fetch('/api/data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('heartRate').textContent = data.heartRateWorking ? 
-                        (data.heartRate || '--') : 'SENSOR ERROR';
-                    document.getElementById('temperature').textContent = data.tempWorking ? 
-                        (data.temperature || '--') : 'SENSOR ERROR';
-                    document.getElementById('gsr').textContent = data.gsr || '--';
-                    
-                    // Update status based on sensor health
-                    let statusText = '';
-                    if (!data.heartRateWorking) {
-                        statusText = 'HR Sensor Error';
-                    } else if (!data.tempWorking) {
-                        statusText = 'Temp Sensor Error';
-                    } else if (data.fingerDetected) {
-                        statusText = 'Finger OK';
-                    } else {
-                        statusText = 'No Finger';
-                    }
-                    document.getElementById('status').textContent = statusText;
-                    
-                    updateMoodDisplay(data.mood, data.progress);
-                    
-                    // Update status message
-                    if (!data.heartRateWorking || !data.tempWorking) {
-                        document.getElementById('statusMessage').textContent = 'Sensor connection error - check wiring';
-                        document.querySelector('.container').classList.add('offline');
-                    } else if (data.fingerDetected) {
-                        document.getElementById('statusMessage').textContent = 'Monitoring your mood...';
-                        document.querySelector('.container').classList.remove('offline');
-                    } else {
-                        document.getElementById('statusMessage').textContent = 'Please place finger on sensor';
-                        document.querySelector('.container').classList.add('offline');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('statusMessage').textContent = 'Connection error';
-                    document.querySelector('.container').classList.add('offline');
-                });
-        }
-        
-        // Auto-refresh every 2 seconds
-        setInterval(refreshData, 2000);
-        
-        // Initial load
-        refreshData();
-    </script>
-</body>
-</html>
-)rawliteral";
-  
-  server.send(200, "text/html", html);
-}
-
-void handleAPI() {
-  DynamicJsonDocument doc(1024);
-  
-  doc["heartRate"] = beatAvg;
-  doc["temperature"] = currentTemp;
-  doc["gsr"] = currentGSR;
-  doc["mood"] = currentMood;
-  doc["progress"] = moodProgress;
-  doc["fingerDetected"] = fingerDetected;
-  doc["heartRateWorking"] = heartRateWorking;
-  doc["tempWorking"] = tempWorking;
-  doc["timestamp"] = millis();
-  
-  String response;
-  serializeJson(doc, response);
-  
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send(200, "application/json", response);
-}
 
 void initializeAdaptiveBaseline() {
   adaptive_baseline.heart_rate_baseline = 0;
@@ -482,8 +240,7 @@ void initializeAdaptiveBaseline() {
 }
 
 void performImprovedCalibration(unsigned long current_time) {
-  // calibration period of 2 minutes for baseline
-  if (current_time - calibration_start_time >= 120000) { // 2 minutes
+  if (current_time - calibration_start_time >= 60000) { // 1 minute
     calculateAdaptiveBaseline();
     current_state = MONITORING;
     sample_index = 0;
@@ -495,14 +252,11 @@ void performImprovedCalibration(unsigned long current_time) {
     return;
   }
   
-  // Update progress during calibration
-  moodProgress = ((current_time - calibration_start_time) / 120000.0) * 100;
+  moodProgress = ((current_time - calibration_start_time) / 60000.0) * 100;
   if (moodProgress > 100) moodProgress = 100;
   
-  // Collect calibration samples every 2 seconds
-  if (current_time - last_sample_time >= 2000) {
+  if (current_time - last_sample_time >= 1000) {
      if (sample_index < 30 && fingerDetected) {
-      // Only collect samples when finger is detected and readings are valid
       if (currentHR > 30 && currentHR < 150 && currentTemp > 30 && currentTemp < 42) {
         hr_samples[sample_index] = currentHR;
         temp_samples[sample_index] = currentTemp;
@@ -524,7 +278,6 @@ void calculateAdaptiveBaseline() {
     return;
   }
   
-  // Calculate mean values
   float hr_sum = 0, temp_sum = 0, gsr_sum = 0;
   
   for (int i = 0; i < sample_index; i++) {
@@ -537,7 +290,6 @@ void calculateAdaptiveBaseline() {
   adaptive_baseline.temperature_baseline = temp_sum / sample_index;
   adaptive_baseline.gsr_baseline = gsr_sum / sample_index;
   
-  // Calculate standard deviation with minimum thresholds
   float hr_var = 0, temp_var = 0, gsr_var = 0;
   
   for (int i = 0; i < sample_index; i++) {
@@ -550,7 +302,6 @@ void calculateAdaptiveBaseline() {
   adaptive_baseline.temperature_std = sqrt(temp_var / sample_index);
   adaptive_baseline.gsr_std = sqrt(gsr_var / sample_index);
   
-  // Ensure minimum standard deviation to avoid over-sensitivity
   if (adaptive_baseline.heart_rate_std < 5.0) adaptive_baseline.heart_rate_std = 5.0;
   if (adaptive_baseline.temperature_std < 0.2) adaptive_baseline.temperature_std = 0.2;
   if (adaptive_baseline.gsr_std < 20.0) adaptive_baseline.gsr_std = 20.0;
@@ -560,7 +311,6 @@ void calculateAdaptiveBaseline() {
 }
 
 void updateAdaptiveBaseline(float hr_avg, float temp_avg, float gsr_avg) {
-  // Add to rolling history
   adaptive_baseline.hr_history[adaptive_baseline.history_index] = hr_avg;
   adaptive_baseline.temp_history[adaptive_baseline.history_index] = temp_avg;
   adaptive_baseline.gsr_history[adaptive_baseline.history_index] = gsr_avg;
@@ -570,7 +320,6 @@ void updateAdaptiveBaseline(float hr_avg, float temp_avg, float gsr_avg) {
     adaptive_baseline.history_full = true;
   }
   
-  // Recalculate baseline from recent history every 10 measurements
   if (adaptive_baseline.measurements_count % 10 == 0) {
     int count = adaptive_baseline.history_full ? 20 : adaptive_baseline.history_index;
     
@@ -581,7 +330,6 @@ void updateAdaptiveBaseline(float hr_avg, float temp_avg, float gsr_avg) {
       gsr_sum += adaptive_baseline.gsr_history[i];
     }
     
-    // Gentle adaptation - only adjust baseline by 10% toward new average
     float new_hr_baseline = hr_sum / count;
     float new_temp_baseline = temp_sum / count;
     float new_gsr_baseline = gsr_sum / count;
@@ -599,9 +347,11 @@ void updateAdaptiveBaseline(float hr_avg, float temp_avg, float gsr_avg) {
 }
 
 String improvedMoodDetection() {
-  // Calculate average values for the current minute
- for (int i = 0; i < SAMPLES_PER_45MIN; i++) {
-    if (hr_samples[i] > 30 && hr_samples[i] < 150) {  // Valid heart rate range
+  float hr_avg = 0, temp_avg = 0, gsr_avg = 0;
+  int valid_samples = 0;
+  
+  for (int i = 0; i < SAMPLES_PER_1MIN; i++) {
+    if (hr_samples[i] > 30 && hr_samples[i] < 150) {
       hr_avg += hr_samples[i];
       temp_avg += temp_samples[i];
       gsr_avg += gsr_samples[i];
@@ -609,35 +359,31 @@ String improvedMoodDetection() {
     }
   }
   
-  if (valid_samples < 500) {
-    return "Uncertain";  // Not enough valid samples
+  // Changed: If insufficient samples, return "Stressed" instead of "Uncertain"
+  if (valid_samples < 5) {
+    return "Stressed";
   }
   
   hr_avg /= valid_samples;
   temp_avg /= valid_samples;
   gsr_avg /= valid_samples;
   
-  // Update adaptive baseline
   updateAdaptiveBaseline(hr_avg, temp_avg, gsr_avg);
   
-  // Calculate z-scores using adaptive baseline
   float hr_z = (hr_avg - adaptive_baseline.heart_rate_baseline) / adaptive_baseline.heart_rate_std;
   float temp_z = (temp_avg - adaptive_baseline.temperature_baseline) / adaptive_baseline.temperature_std;
   float gsr_z = (gsr_avg - adaptive_baseline.gsr_baseline) / adaptive_baseline.gsr_std;
   
-  // Calculate variability
   float hr_var = calculateVariability(hr_samples, hr_avg);
   float temp_var = calculateVariability(temp_samples, temp_avg);
   float gsr_var = calculateVariability(gsr_samples, gsr_avg);
   
-  // Debug information
   Serial.println("Improved mood detection:");
   Serial.println("HR z-score: " + String(hr_z) + " (avg: " + String(hr_avg) + ")");
   Serial.println("Temp z-score: " + String(temp_z) + " (avg: " + String(temp_avg) + ")");
   Serial.println("GSR z-score: " + String(gsr_z) + " (avg: " + String(gsr_avg) + ")");
   Serial.println("Variability - HR: " + String(hr_var) + ", Temp: " + String(temp_var) + ", GSR: " + String(gsr_var));
   
-  // Improved mood scoring system
   struct MoodScore {
     float calm_score = 0;
     float stressed_score = 0;
@@ -645,7 +391,6 @@ String improvedMoodDetection() {
     float happy_score = 0;
   } scores;
   
-  // CALM detection - all values close to baseline with low variability
   if (abs(hr_z) < improved_thresholds.calm_hr_max && 
       abs(temp_z) < improved_thresholds.calm_temp_max && 
       abs(gsr_z) < improved_thresholds.calm_gsr_max) {
@@ -656,7 +401,6 @@ String improvedMoodDetection() {
     scores.calm_score += 1.5;
   }
   
-  // STRESSED detection - elevated values and/or high variability
   if (hr_z > improved_thresholds.stressed_hr_min || 
       temp_z > improved_thresholds.stressed_temp_min || 
       gsr_z > improved_thresholds.stressed_gsr_min) {
@@ -667,7 +411,6 @@ String improvedMoodDetection() {
     scores.stressed_score += 1.5;
   }
   
-  // Multiple elevated readings indicate stress
   int elevated_count = 0;
   if (hr_z > 1.0) elevated_count++;
   if (temp_z > 0.8) elevated_count++;
@@ -677,31 +420,26 @@ String improvedMoodDetection() {
     scores.stressed_score += 1.0;
   }
   
-  // SAD detection - moderate changes with specific patterns
   if (hr_z >= improved_thresholds.sad_hr_range_low && hr_z <= improved_thresholds.sad_hr_range_high &&
       temp_z >= improved_thresholds.sad_temp_range_low && temp_z <= improved_thresholds.sad_temp_range_high &&
       gsr_z > improved_thresholds.sad_gsr_min) {
     scores.sad_score += 2.0;
   }
   
-  // Lower heart rate with elevated GSR
   if (hr_z < 0.5 && gsr_z > 0.8) {
     scores.sad_score += 1.0;
   }
   
-  // HAPPY detection - positive but not extreme changes
   if (hr_z >= improved_thresholds.happy_hr_range_low && hr_z <= improved_thresholds.happy_hr_range_high &&
       temp_z >= improved_thresholds.happy_temp_range_low && temp_z <= improved_thresholds.happy_temp_range_high &&
       gsr_z >= improved_thresholds.happy_gsr_range_low && gsr_z <= improved_thresholds.happy_gsr_range_high) {
     scores.happy_score += 2.0;
   }
   
-  // Moderate variability with slight elevation suggests happiness
   if (hr_var > 4.0 && hr_var < 9.0 && temp_z > 0.3 && temp_z < 1.0) {
     scores.happy_score += 1.0;
   }
   
-  // Find the highest scoring mood
   float max_score = max(max(scores.calm_score, scores.stressed_score), 
                        max(scores.sad_score, scores.happy_score));
   
@@ -710,9 +448,9 @@ String improvedMoodDetection() {
                  ", Sad: " + String(scores.sad_score) + 
                  ", Happy: " + String(scores.happy_score));
   
-  // Require minimum confidence for mood detection
+  // Changed: If no clear mood detected, default to "Stressed" instead of "Calm"
   if (max_score < 1.5) {
-    return "Calm";  // Default to calm if no strong indicators
+    return "Stressed";
   }
   
   if (max_score == scores.calm_score) return "Calm";
@@ -720,21 +458,21 @@ String improvedMoodDetection() {
   if (max_score == scores.sad_score) return "Sad";
   if (max_score == scores.happy_score) return "Happy";
   
-  return "Calm";  
+  // Changed: Final fallback to "Stressed" instead of "Calm"
+  return "Stressed";  
 }
 
 float calculateVariability(float samples[], float mean) {
   float variance = 0;
   int valid_count = 0;
   
-  for (int i = 0; i < SAMPLES_PER_45MIN; i++) {
-    if (samples[i] > 0) {  // Only count valid samples
+  for (int i = 0; i < SAMPLES_PER_1MIN; i++) {
+    if (samples[i] > 0) {
       variance += pow(samples[i] - mean, 2);
       valid_count++;
     }
   }
 
-  
   if (valid_count > 0) {
     return sqrt(variance / valid_count);
   }
@@ -749,22 +487,58 @@ void printAdaptiveBaseline() {
   Serial.println("Confidence: " + String(adaptive_baseline.confidence_factor * 100) + "%");
 }
 
+void performMoodDetection(unsigned long current_time) {
+  if (current_state == CALIBRATING) {
+    performImprovedCalibration(current_time);  
+  } else if (current_state == MONITORING) {
+    performMonitoring(current_time);
+  }
+}
+
+void performMonitoring(unsigned long current_time) {
+  if (current_time - last_sample_time >= 1000) {
+    if (sample_index < SAMPLES_PER_1MIN) {
+      hr_samples[sample_index] = currentHR;
+      temp_samples[sample_index] = currentTemp;
+      gsr_samples[sample_index] = currentGSR;
+      sample_index++;
+      last_sample_time = current_time;
+      
+      moodProgress = (sample_index / (float)SAMPLES_PER_1MIN) * 100;
+      
+      if (sample_index >= SAMPLES_PER_1MIN) {
+        period_complete = true;
+      }
+    }
+  }
+  
+  if (period_complete) {
+    String detected_mood = improvedMoodDetection();
+    currentMood = detected_mood;
+    moodProgress = 100;
+    Serial.println("Mood detected after 1 minute: " + detected_mood);
+    
+    sample_index = 0;
+    period_complete = false;
+    moodProgress = 0;
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   delay(2000);
+  
+  // Initialize BLE
+  initializeBLE();
   
   // Initialize I2C
   Wire.begin();
   delay(100);
   
-  // Initialize sensors with error handling
+  // Initialize heart rate sensor
   Serial.println("Initializing MAX30102 Heart Rate Sensor...");
   if (!particleSensor.begin(Wire, I2C_SPEED_STANDARD)) {
-    Serial.println("ERROR: MAX30102 not found! Check wiring:");
-    Serial.println("- SDA to GPIO 21");
-    Serial.println("- SCL to GPIO 22"); 
-    Serial.println("- 3.3V and GND connections");
-    Serial.println("- Try different I2C address or speed");
+    Serial.println("ERROR: MAX30102 not found!");
     heartRateWorking = false;
   } else {
     Serial.println("MAX30105 found and initialized!");
@@ -782,7 +556,7 @@ void setup() {
     smoothBuffer[i] = 0;
   }
   
-  // Initialize temperature sensor with error handling
+  // Initialize temperature sensor
   Serial.println("Initializing DS18B20 Temperature Sensor...");
   sensors.begin();
   int deviceCount = sensors.getDeviceCount();
@@ -791,10 +565,7 @@ void setup() {
   Serial.println(" DS18B20 devices");
   
   if (deviceCount == 0) {
-    Serial.println("ERROR: No DS18B20 found! Check:");
-    Serial.println("- Data wire to GPIO 13");
-    Serial.println("- 4.7kΩ pull-up resistor to 3.3V");
-    Serial.println("- Power connections");
+    Serial.println("ERROR: No DS18B20 found!");
     tempWorking = false;
   } else {
     tempWorking = true;
@@ -813,45 +584,20 @@ void setup() {
   Serial.println(tempWorking ? "OK" : "FAILED");
   Serial.println("GSR: OK");
   Serial.println("====================");
-  
+  pinMode(BATTERY_PIN, INPUT);
+  Serial.println("Battery monitor initialized on GPIO 39");
   // Initialize enhanced mood detection system
   Serial.println("Initializing Enhanced Mood Detection System...");
   Serial.println("Please remain calm for the first minute for calibration.");
   
   calibration_start_time = millis();
   current_state = CALIBRATING;
-  // Initialize enhanced mood detection system
   initializeAdaptiveBaseline();
-  
-  // Initialize WiFi 
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-  
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  
-  Serial.println();
-  Serial.print("Connected to WiFi! IP address: ");
-  Serial.println(WiFi.localIP());
-  
-  // Setup web server routes
-  server.on("/", handleRoot);
-  server.on("/api/data", handleAPI);
-  
-  server.begin();
-  Serial.println("Web server started!");
-  Serial.println("Open your phone browser and go to: http://" + WiFi.localIP().toString());
 }
 
 void loop() {
-  // Handle web server
-  server.handleClient();
-  
-  // Heart rate detection with error handling
+  // Heart rate detection
   if (heartRateWorking) {
-    // Check if sensor is still responding
     if (particleSensor.safeCheck(250)) {
       irValue = particleSensor.getIR();
       
@@ -936,13 +682,11 @@ void loop() {
         lastIR = smoothedIR;
       }
     } else {
-      // Sensor communication failed
       fingerDetected = false;
       currentHR = 0;
       beatAvg = 0;
     }
   } else {
-    // Heart rate sensor not working
     fingerDetected = false;
     currentHR = 0;
     beatAvg = 0;
@@ -968,57 +712,33 @@ void loop() {
     gsrValue = analogRead(GSR_PIN);
     currentGSR = gsrValue;
     
+    int rawValue = analogRead(BATTERY_PIN);
+    float batteryVoltage = (rawValue / 4095.0) * 3.3 * 2.0;  // Voltage divider factor of 2
+    currentBattery = getBatteryPercentage(batteryVoltage);
+
     // Enhanced mood detection system
     performMoodDetection(currentMillis);
+
+    // Prepare JSON data for BLE transmission
+    DynamicJsonDocument doc(256);
+    doc["hr"] = currentHR;
+    doc["temp"] = currentTemp;
+    doc["gsr"] = currentGSR;
+    doc["mood"] = currentMood;
+    doc["progress"] = moodProgress;
+    doc["finger"] = fingerDetected;
+    doc["battery"] = currentBattery;
+    
+    String jsonString;
+    serializeJson(doc, jsonString);
+    
+    // Send data via BLE
+    if (deviceConnected) {
+      pCharacteristic->setValue(jsonString.c_str());
+      pCharacteristic->notify();
+      Serial.println("Sent BLE data: " + jsonString);
+    }
   }
   
   delay(25);
 }
-
-void performMoodDetection(unsigned long current_time) {
-  if (current_state == CALIBRATING) {
-  performImprovedCalibration(current_time);  
-} else if (current_state == MONITORING) {
-    performMonitoring(current_time);
-  }
-}
-
-// Improved calibration with longer period and better validation
-
-
-void performMonitoring(unsigned long current_time) {
-  // Collect samples every 2 seconds for 45 minutes
-  if (current_time - last_sample_time >= 2000) {
-    if (sample_index < SAMPLES_PER_45MIN) {
-      hr_samples[sample_index] = currentHR;
-      temp_samples[sample_index] = currentTemp;
-      gsr_samples[sample_index] = currentGSR;
-      sample_index++;
-      last_sample_time = current_time;
-      
-      // Update progress
-      moodProgress = (sample_index / (float)SAMPLES_PER_45MIN) * 100;
-      
-      if (sample_index >= SAMPLES_PER_45MIN) {
-        period_complete = true;
-      }
-    }
-  }
-  
-  // Process mood detection after collecting 45 minutes of data
-  if (period_complete) {
-    String detected_mood = improvedMoodDetection();
-    currentMood = detected_mood;
-    moodProgress = 100;
-    Serial.println("Mood detected after 45 minutes: " + detected_mood);
-    
-    // Reset for next 45-minute period
-    sample_index = 0;
-    period_complete = false;
-    moodProgress = 0;
-  }
-}
-
-
-
-
