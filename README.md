@@ -1,8 +1,8 @@
-### MoodSense
-**Revolutionizing Addiction Recovery Through Continuous Mood Surveillance**
+### **MoodSense**
+
 
 **A Real-Time Physiological Monitoring System for Relapse Prevention and Recovery Support**
-##  🎯 **Overview**
+##  🎯 **Overview-Revolutionizing Addiction Recovery Through Continuous Mood Surveillance**
 MoodSense addresses one of the most critical challenges in addiction recovery: **objective tracking and reporting of mood patterns over time**. Mood disorders, including depression and bipolar disorders, are the most common psychiatric comorbidities among patients with substance use disorders, making continuous mood monitoring essential for successful recovery outcomes.
 
 Our system leverages multi-sensor physiological data to provide objective mood history and patterns, enabling healthcare providers, counselors, and individuals in recovery to understand emotional trends and make informed decisions about treatment and support strategies.
