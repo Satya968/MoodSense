@@ -310,37 +310,6 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 
 ---
 
-## 🤝 **Contributing to Recovery Innovation**
-
-### Open Source Collaboration
-- **Research Community**: Collaborate with addiction medicine researchers
-- **Clinical Partnerships**: Work with treatment centers for real-world validation
-- **Technology Development**: Contribute to sensor and algorithm improvements
-- **Patient Advocacy**: Ensure solutions meet real recovery needs
-
-### Academic Partnerships
-- **Clinical Studies**: Support formal research initiatives
-- **Algorithm Development**: Advance machine learning applications
-- **Sensor Innovation**: Improve physiological monitoring accuracy
-- **Recovery Outcomes**: Measure technology impact on treatment success
-
----
-
-## 📞 **Support & Resources**
-
-### Crisis Resources
-- **SAMHSA National Helpline**: 1-800-662-4357 (Free, confidential, 24/7 treatment referral service)
-- **Emergency Services**: 911 for immediate medical emergencies
-- **Crisis Text Line**: Text HOME to 741741
-
-### Technical Support
-- **Documentation**: Comprehensive setup and troubleshooting guides
-- **Community Forum**: User and developer support community
-- **Clinical Training**: Healthcare provider implementation support
-- **Research Collaboration**: Academic and clinical partnership opportunities
-
----
-
 ## 👥 **Development Team**
 
 **IIIT Bangalore - ELCIA Sense2Scale 2025 Hackathon**
@@ -360,10 +329,6 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 - **Clinical Advisors** - Guidance on addiction recovery best practices
 
 ---
-
-## 📄 **License & Ethical Considerations**
-
-This project is developed for research and clinical applications in addiction recovery. All data handling follows privacy protection guidelines, and the system is designed to complement, not replace, professional medical care and counseling services.
 
 **Disclaimer**: MoodSense is a research tool designed to support addiction recovery efforts. It should not be used as the sole basis for clinical decisions and must be integrated with comprehensive professional treatment programs.
 
