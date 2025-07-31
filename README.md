@@ -1,4 +1,5 @@
-# MoodSense: Continuous Mood Monitoring for Addiction Recovery (De-addiction Support)
+# MoodSense
+Continuous Mood Monitoring for Addiction Recovery (De-addiction Support)
 
 ## Overview
 
