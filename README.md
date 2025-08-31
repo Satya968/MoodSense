@@ -323,7 +323,7 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
----
+
 **Disclaimer**: MoodSense is a research tool designed to support addiction recovery efforts. It should not be used as the sole basis for clinical decisions and must be integrated with comprehensive professional treatment programs.
 
 ---
