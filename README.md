@@ -302,7 +302,7 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 
 ---
 
-## 👥 **Development Team**
+##  **Development Team**
 
 **IIIT Bangalore - ELCIA Sense2Scale 2025 Hackathon**
 
@@ -312,7 +312,7 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 
 ---
 
-## 📝 **Acknowledgments**
+##  **Acknowledgments**
 
 - **ELCIA Sense2Scale 2025 Hackathon** - Platform for innovation and development
 - **Addiction Recovery Community** - Inspiration and feedback for clinical applications
@@ -320,7 +320,10 @@ The comprehensive sensor characterization and validated accuracy make MoodSense 
 - **Open Source Community** - Reference implementations and collaborative development
 
 ---
+## License
 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+---
 **Disclaimer**: MoodSense is a research tool designed to support addiction recovery efforts. It should not be used as the sole basis for clinical decisions and must be integrated with comprehensive professional treatment programs.
 
 ---
